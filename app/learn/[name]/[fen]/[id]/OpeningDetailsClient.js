@@ -351,7 +351,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
           setIsGameOver(true);
         } else if (gameCopy.isCheck()) {
           toast("Check!", {
-            description: "Your king is in check.",
+            description: "king is in check.",
           });
         } else if (gameCopy.isDraw()) {
           await addMessage("Game is a draw!");
