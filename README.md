@@ -217,13 +217,11 @@ Visit `http://localhost:3000` to see the application running.
 
 We welcome contributions! Follow these steps:
 
-1. Fork the repository (` gh repo fork https://github.com/0xmetaschool/<update>.git`)
+1. Fork the repository (` gh repo fork https://github.com/0xmetaschool/Castle.ai.git`)
 2. Create your feature branch (` git checkout -b feature/AmazingFeature`)
 3. Commit changes (` git commit -m 'Add AmazingFeature'`)
 4. Push to branch (` git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-Please read our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ## License
 
