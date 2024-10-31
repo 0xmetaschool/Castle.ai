@@ -94,7 +94,7 @@ Backend:
 1. **Clone the repository**
 
 ```bash
-git clone
+git clone https://github.com/0xmetaschool/Castle.ai.git
 cd
 ```
 
@@ -124,6 +124,10 @@ npm run dev
 Visit `http://localhost:3000` to see the application running.
 
 ## Screenshots
+
+<div align="center">
+  <img src="public/App.gif" alt="Application Demo" width="800px" />
+</div>
 
 ## How to use the application
 
