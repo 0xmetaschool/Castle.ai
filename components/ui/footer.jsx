@@ -33,7 +33,7 @@ const Footer = () => {
           {/* Left content */}
           <div style={{ pointerEvents: "auto" }}>
             <div className="text-gray-500 text-xs mb-4 pt-1 pb-1 pl-3 pr-3 bg-slate-100 max-w-[190px] relative z-[1]">
-              Free Open source AI template
+              Free open source AI template
             </div>
             <div className="text-black dark:text-white mb-2 text-2xl font-bold font-sans relative z-[1]">
               Build your own Castle.ai
