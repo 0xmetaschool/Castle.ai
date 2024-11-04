@@ -39,17 +39,11 @@ export default function OpeningDetailsClient({ name, fen, id }) {
   const scrollAreaRef = useRef(null);
   const moveAudioRef = useRef(null);
 
+  //  Initialize audio
   useEffect(() => {
     try {
       const audio = new Audio("/move-self.wav");
-      console.log("Audioooo : ", audio);
-
-      // Add loading event listener
-      audio.addEventListener("canplaythrough", () => {
-        console.log("Audio loaded successfully");
-      });
-
-      // Add error event listener
+      audio.addEventListener("canplaythrough", () => {});
       audio.addEventListener("error", (e) => {
         console.error("Audio loading error:", {
           error: e.target.error,
@@ -59,11 +53,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
       });
 
       moveAudioRef.current = audio;
-
-      // Optional: Preload the audio
       audio.load();
-
-      // Cleanup listeners on unmount
       return () => {
         audio.removeEventListener("canplaythrough", () => {});
         audio.removeEventListener("error", () => {});
@@ -73,19 +63,16 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   }, []);
 
+  //  Play move sound
   const playMoveSound = () => {
     try {
       if (moveAudioRef.current) {
-        console.log("Attempting to play sound from:", moveAudioRef.current.src);
         moveAudioRef.current.currentTime = 0;
         const playPromise = moveAudioRef.current.play();
-        console.log(playPromise);
 
         if (playPromise !== undefined) {
           playPromise
-            .then(() => {
-              console.log("Audio played successfully");
-            })
+            .then(() => {})
             .catch((err) => {
               console.error("Playback error:", {
                 error: err,
@@ -106,7 +93,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
-  // States
+  //  Set opening details
   const [openingDetails, setOpeningDetails] = useState(() => {
     if (name && fen) {
       return {
@@ -133,6 +120,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
 
+  //  Scroll to bottom
   const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector(
@@ -144,12 +132,12 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   }, []);
 
-  // Update the auto-scroll effect
+  //  Scroll to bottom on messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages, suggestedMoves, scrollToBottom]);
 
-  // Cleanup effect
+  //  Clean up on unmount
   useEffect(() => {
     return () => {
       setGame(null);
@@ -160,7 +148,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     };
   }, []);
 
-  // Game initialization effect
+  //  Fetch user data
   useEffect(() => {
     setMounted(true);
     const token = localStorage.getItem("jwtToken");
@@ -175,11 +163,13 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   }, []);
 
+  //  Update game state
   const updateGame = useCallback((newGame) => {
     setGame(newGame);
     gameRef.current = newGame;
   }, []);
 
+  //  Handle chat submit
   const handleChatSubmit = async (e) => {
     e.preventDefault();
     if (inputMessage.trim() === "" || !gameRef.current) return;
@@ -221,6 +211,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
 
         Please provide a short, single sentence and precise response that is relevant to the current game state and opening being studied. Focus on practical advice and clear explanations.`;
 
+      // Send request for AI response
       const response = await fetch("/api/openai", {
         method: "POST",
         headers: {
@@ -262,7 +253,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
             "I apologize, I had trouble understanding that. Could you try rephrasing your question?",
         },
       ]);
-
+      // Show error toast message
       toast({
         title: "Error",
         description: "Failed to get response",
@@ -275,6 +266,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
+  //  Add message to chat
   const addMessage = async (
     content,
     role = "assistant",
@@ -287,10 +279,12 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
+  //  Remove thinking messages
   const removeThinkingMessages = () => {
     setMessages((prev) => prev.filter((msg) => !msg.isThinking));
   };
 
+  //  Loading message component
   const LoadingMessage = () => (
     <div className="flex items-center space-x-2 bg-muted p-3 rounded-lg max-w-[85%]">
       <div className="text-black dark:text-white">Thinking...</div>
@@ -327,6 +321,8 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
     return false;
   }, []);
+
+  //  Make a move and update the game state for both player and AI
   const makeAMove = useCallback(
     async (move) => {
       if (!gameRef.current) return null;
@@ -373,6 +369,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     [updateGame]
   );
 
+  //  Get AI move and update the game state
   const getAIMove = useCallback(async () => {
     if (!gameRef.current) return null;
 
@@ -423,6 +420,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   }, [gameRef, userColor, makeAMove]);
 
+  //  Handle AI move and update the game state
   const handleAIMove = useCallback(async () => {
     if (!gameRef.current || isGameOver) return;
 
@@ -451,6 +449,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   }, [gameRef, isGameOver, getAIMove, checkGameEnd]);
 
+  //  Handle operation to be done on drop of a piece on the board
   const onDrop = useCallback(
     async (sourceSquare, targetSquare) => {
       if (!gameRef.current || isGameOver) return false;
@@ -512,6 +511,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     ]
   );
 
+  //  Start general phase
   const startGeneralPhase = async () => {
     setIsOpeningPhase(false);
     setSuggestedMoves([]);
@@ -529,6 +529,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
+  //  Handle suggested move click event
   const handleSuggestedMove = useCallback(
     async (move) => {
       if (!gameRef.current || isGameOver) {
@@ -563,7 +564,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
           });
           return;
         }
-
+        // Make move
         const result = await onDrop(moveDetails.from, moveDetails.to);
         if (!result) {
           toast("Error", {
@@ -580,20 +581,18 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     [gameRef, isGameOver, userColor, onDrop]
   );
 
+  //  Fetch user data
   const fetchUserData = async (id) => {
     try {
-      console.log("Fetching user data for ID:", id);
       const response = await fetch(`/api/user?id=${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
         },
       });
-      console.log("Response:", response);
 
       if (response.ok) {
         const data = await response.json();
         setUsername(data.username);
-        console.log("User data:", data);
       } else {
         throw new Error("Failed to fetch user data");
       }
@@ -607,6 +606,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
+  //  Parse opening moves from string response returned by API
   const parseOpeningMoves = (movesString) => {
     if (!movesString) return [];
     return movesString
@@ -617,6 +617,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
       .filter((move) => move && move.length > 0);
   };
 
+  //  Get opening advantage
   const getOpeningAdvantage = async (opening) => {
     try {
       const prompt = `You are a chess instructor teaching beginners. In 10-15 words, explain the main advantage of the ${opening.name} opening. Keep it simple and avoid technical terms.`;
@@ -640,6 +641,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
+  //  Get move explanation
   const getMoveExplanation = async (movesSoFar, currentMove) => {
     try {
       const prompt = `You are a chess instructor teaching beginners. The following moves have been played in the ${
@@ -666,13 +668,12 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
+  //  Start opening lesson phase
   const startOpeningLesson = async (opening, moves) => {
     if (!gameRef.current) {
       console.error("Game not initialized");
       return;
     }
-
-    console.log("Starting opening lesson...");
     setMessages([]);
     setIsOpeningPhase(true);
     setCurrentOpeningMove(0);
@@ -779,7 +780,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
       }
     }
   };
-
+  //  Fetch opening details and start opening lesson
   const fetchOpeningDetails = async (openingId) => {
     setIsLoading(true);
 
@@ -791,8 +792,6 @@ export default function OpeningDetailsClient({ name, fen, id }) {
       }
 
       const data = await response.json();
-      console.log("Opening details fetched:", data);
-
       if (data && data.opening) {
         const opening = data.opening;
         const moves = parseOpeningMoves(opening.moves);
@@ -813,14 +812,14 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   };
 
+  //  Handle sign out
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
     router.push("/");
   };
 
+  //  Handle reset
   const handleReset = async () => {
-    console.log("Resetting game...");
-
     const newGame = new Chess();
     updateGame(newGame);
     setIsOpeningPhase(true);
@@ -867,13 +866,9 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     }
   }, [mounted, openingDetails, id, updateGame]);
 
-  if (!mounted || !game || !openingDetails) {
-    return null;
-  }
-
+  //  Loading skeleton
   const LoadingSkeleton = () => (
     <div className="h-screen  bg-white dark:bg-black flex flex-col overflow-hidden">
-      {/* Navigation Bar Skeleton */}
       <nav className="h-16 px-6 flex justify-between items-center border-b fixed">
         <Skeleton className="h-8 w-24" />
         <div className="flex items-center gap-4">
@@ -882,28 +877,22 @@ export default function OpeningDetailsClient({ name, fen, id }) {
         </div>
       </nav>
 
-      {/* Main Content Area Skeleton */}
       <div className="flex-1 flex items-center justify-center p-6  bg-white dark:bg-black">
         <div className="flex gap-8 items-start max-w-[1200px] w-full">
-          {/* Left Column - Chessboard Skeleton */}
           <div className="flex-1 flex flex-col items-center">
-            <Skeleton className="h-8 w-96 mb-6" /> {/* Title */}
+            <Skeleton className="h-8 w-96 mb-6" />
             <div className="flex space-x-2 mb-4">
               <Skeleton className="h-8 w-32" />
               <Skeleton className="h-8 w-32" />
             </div>
-            {/* Chessboard Skeleton */}
             <Skeleton className="w-[600px] h-[600px] mb-6" />
-            {/* Buttons Skeleton */}
             <div className="flex gap-4">
               <Skeleton className="h-10 w-32" />
               <Skeleton className="h-10 w-32" />
             </div>
           </div>
 
-          {/* Right Column - Tutorial Panel Skeleton */}
           <div className="w-[400px] h-[700px] flex flex-col  bg-white dark:bg-black rounded-lg border shadow-sm">
-            {/* Header Skeleton */}
             <div className="px-4 py-3 border-b">
               <div className="flex items-center justify-between">
                 <Skeleton className="h-6 w-32" />
@@ -915,7 +904,6 @@ export default function OpeningDetailsClient({ name, fen, id }) {
               </div>
             </div>
 
-            {/* Messages Area Skeleton */}
             <div className="flex-1 p-4">
               <div className="flex flex-col space-y-4">
                 {[...Array(5)].map((_, index) => (
@@ -935,7 +923,6 @@ export default function OpeningDetailsClient({ name, fen, id }) {
               </div>
             </div>
 
-            {/* Input Area Skeleton */}
             <div className="p-4 border-t">
               <div className="flex gap-3">
                 <Skeleton className="h-10 flex-1" />
@@ -948,6 +935,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
     </div>
   );
 
+  //   Main UI
   if (!mounted || !game || !openingDetails || isLoading) {
     return <LoadingSkeleton />;
   }
@@ -959,7 +947,6 @@ export default function OpeningDetailsClient({ name, fen, id }) {
       transition={{ duration: 0.5 }}
       className="h-screen bg-background flex flex-col overflow-hidden bg-white dark:bg-black"
     >
-      {/* Navigation Bar */}
       <nav className="h-16 px-6 flex justify-between items-center fixed w-full">
         <div
           className="text-2xl font-bold dark:text-white text-black cursor-pointer"
@@ -1001,11 +988,8 @@ export default function OpeningDetailsClient({ name, fen, id }) {
           </DropdownMenu>
         </div>
       </nav>
-
-      {/* Main Content Area */}
       <div className="flex-1 flex items-center justify-center p-6 pt-20">
         <div className="flex gap-8 items-start max-w-[1200px] w-full">
-          {/* Left Column - Chessboard */}
           <div className="flex-1 flex flex-col items-center">
             <h1 className="text-2xl font-bold mb-6 dark:text-white text-black">
               {openingDetails.name}
@@ -1051,9 +1035,7 @@ export default function OpeningDetailsClient({ name, fen, id }) {
             </div>
           </div>
 
-          {/* Right Column - Chat & Moves */}
           <div className="w-[400px] h-[700px] flex flex-col bg-white dark:bg-black rounded-lg border shadow-sm">
-            {/* Header */}
             <div className="px-4 py-3 border-b">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold dark:text-white text-black">
@@ -1108,8 +1090,6 @@ export default function OpeningDetailsClient({ name, fen, id }) {
                 ))}
               </div>
             </ScrollArea>
-
-            {/* Suggested Moves */}
             {suggestedMoves.length > 0 && (
               <div className="p-4 border-t">
                 <div className="text-sm font-medium mb-2 dark:text-white text-black">
@@ -1130,7 +1110,6 @@ export default function OpeningDetailsClient({ name, fen, id }) {
               </div>
             )}
 
-            {/* Chat Input */}
             <div className="p-4 border-t">
               <form onSubmit={handleChatSubmit} className="flex gap-3">
                 <Input
@@ -1154,7 +1133,6 @@ export default function OpeningDetailsClient({ name, fen, id }) {
         </div>
       </div>
 
-      {/* Practice Dialog */}
       <AlertDialog
         open={showPracticeDialog}
         onOpenChange={setShowPracticeDialog}

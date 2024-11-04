@@ -7,22 +7,18 @@ export async function GET(request, { params }) {
     const client = await clientPromise;
     const db = client.db(process.env.MONGO_DB);
     const { id } = params;
-
-    console.log("Fetching opening with ID:", id); // Debug log
-
+    // Check if opening exists
     const opening = await db.collection("moves").findOne({
       _id: new ObjectId(id),
     });
-
+    // Return error if opening doesn't exist
     if (!opening) {
-      console.log("Opening not found for ID:", id); // Debug log
       return new Response(JSON.stringify({ error: "Opening not found" }), {
         status: 404,
         headers: { "Content-Type": "application/json" },
       });
     }
-
-    console.log("Opening found:", opening); // Debug log
+    // Return opening
     return new Response(JSON.stringify({ opening }), {
       status: 200,
       headers: { "Content-Type": "application/json" },

@@ -60,17 +60,11 @@ function Play() {
   const [movesSinceQuickSave, setMovesSinceQuickSave] = useState(0);
   const moveAudioRef = useRef(null);
 
+  //   Initialize audio
   useEffect(() => {
     try {
       const audio = new Audio("/move-self.wav");
-      console.log("Audioooo : ", audio);
-
-      // Add loading event listener
-      audio.addEventListener("canplaythrough", () => {
-        console.log("Audio loaded successfully");
-      });
-
-      // Add error event listener
+      audio.addEventListener("canplaythrough", () => {});
       audio.addEventListener("error", (e) => {
         console.error("Audio loading error:", {
           error: e.target.error,
@@ -78,13 +72,8 @@ function Play() {
           readyState: audio.readyState,
         });
       });
-
       moveAudioRef.current = audio;
-
-      // Optional: Preload the audio
       audio.load();
-
-      // Cleanup listeners on unmount
       return () => {
         audio.removeEventListener("canplaythrough", () => {});
         audio.removeEventListener("error", () => {});
@@ -94,19 +83,16 @@ function Play() {
     }
   }, []);
 
+  //  Play move sound
   const playMoveSound = () => {
     try {
       if (moveAudioRef.current) {
-        console.log("Attempting to play sound from:", moveAudioRef.current.src);
         moveAudioRef.current.currentTime = 0;
         const playPromise = moveAudioRef.current.play();
-        console.log(playPromise);
 
         if (playPromise !== undefined) {
           playPromise
-            .then(() => {
-              console.log("Audio played successfully");
-            })
+            .then(() => {})
             .catch((err) => {
               console.error("Playback error:", {
                 error: err,
@@ -127,6 +113,7 @@ function Play() {
     }
   };
 
+  // Fetch user data
   useEffect(() => {
     setMounted(true);
     const id = searchParams.get("id");
@@ -142,11 +129,13 @@ function Play() {
       }
     }
 
+    // Add event listeners
     const handleBeforeUnload = (e) => {
       e.preventDefault();
       e.returnValue = "";
     };
 
+    // Add event listeners
     const handlePopState = () => {
       setShowResignDialog(true);
     };
@@ -160,6 +149,7 @@ function Play() {
     };
   }, [searchParams, router, gameStarted]);
 
+  // Save game state
   const saveGameState = async () => {
     try {
       const pgn = game.pgn();
@@ -195,12 +185,12 @@ function Play() {
     }
   };
 
+  //  Reset game state
   const resetGameState = async () => {
-    console.log("Reset clicked - 2 ");
     try {
       const newGame = new Chess();
       const pgn = newGame.pgn();
-
+      //  Save game state to database
       const response = await fetch("/api/game-state/game", {
         method: "POST",
         headers: {
@@ -232,6 +222,7 @@ function Play() {
     }
   };
 
+  //  Load saved game state from database
   const loadSavedGame = async () => {
     try {
       const response = await fetch(`/api/game-state/game?id=${userId}`, {
@@ -283,12 +274,14 @@ function Play() {
     }
   };
 
+  // Load saved game state on component mount
   useEffect(() => {
     if (userId && isLoadingGame) {
       loadSavedGame();
     }
   }, [userId]);
 
+  //  Fetch user data
   const fetchUserData = async (id, token) => {
     try {
       const url = id ? `/api/user?id=${id}` : "/api/user";
@@ -318,11 +311,13 @@ function Play() {
     }
   };
 
+  // Show toast
   const showToast = (title, description, variant = "default") => {
     setToast({ title, description, variant });
     setTimeout(() => setToast(null), 3000);
   };
 
+  // Make a move and update game for the user and ai
   const makeAMove = useCallback(
     async (move) => {
       const gameCopy = new Chess(game.fen());
@@ -330,7 +325,7 @@ function Play() {
       try {
         result = gameCopy.move(move);
       } catch (error) {
-        console.log("Result:", result);
+        console.error("Result:", result);
       }
 
       if (result) {
@@ -353,7 +348,7 @@ function Play() {
         if (gameCopy.isCheckmate()) {
           setShowCheckmateDialog(true);
         } else if (gameCopy.isCheck()) {
-          console.log("Check!");
+          showToast("Check", "The king is in check.", "destructive");
         }
       }
       return result;
@@ -361,6 +356,7 @@ function Play() {
     [game, moveIndex]
   );
 
+  //  Handle operation on dropping a piece on the board
   const onDrop = useCallback(
     async (sourceSquare, targetSquare) => {
       if (!gameStarted) {
@@ -384,7 +380,6 @@ function Play() {
         to: targetSquare,
         promotion: "q",
       });
-      console.log(move);
       if (move === null) {
         showToast(
           "Invalid move",
@@ -401,10 +396,12 @@ function Play() {
     [gameStarted, game, userColor, makeAMove]
   );
 
+  //  Handle mode change between easy , medium and hard
   const handleModeChange = (newMode) => {
     setMode(newMode);
   };
 
+  //  Handle game start
   const handleGameStart = async () => {
     const newGame = new Chess();
     setGameStarted(true);
@@ -418,6 +415,7 @@ function Play() {
     }
   };
 
+  //  Handle game exit
   const handleGameExit = async () => {
     if (gameStarted) {
       await resetGameState();
@@ -425,11 +423,13 @@ function Play() {
     router.push(`/home?id=${userId}`);
   };
 
+  //  Handle sign out
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
     router.push("/");
   };
 
+  //  Handle exit
   const handleExitClick = async () => {
     if (gameStarted) {
       await saveGameState();
@@ -437,42 +437,41 @@ function Play() {
     router.push(`/home?id=${userId}`);
   };
 
+  //  Handle resign
   const handleResignClick = async () => {
-    console.log("Resign clicked");
     if (gameStarted) {
       await resetGameState();
     }
     router.push(`/home?id=${userId}`);
   };
 
+  //  Handle quick save
   const handleQuickSave = () => {
     setQuickSave(game);
     setMovesSinceQuickSave(1);
   };
 
+  //  Handle quick load
   const handleQuickLoad = () => {
     if (quickSave) {
       const newGame = new Chess(quickSave.fen());
       setGame(newGame);
-      console.log(movesSinceQuickSave);
       const newMoveHistory = moveHistory.slice(
         0,
         moveHistory.length - 2 * movesSinceQuickSave
       );
       setMoveHistory(newMoveHistory);
       setMovesSinceQuickSave(0);
-      console.log(moveHistory);
     }
   };
 
+  //  Handle AI move
   const getAIMove = useCallback(async () => {
-    console.log("getAIMove()");
     const aiColor = userColor === "white" ? "b" : "w";
     if (game.turn() !== aiColor) return;
 
     try {
       const possibleMoves = game.moves();
-      console.log("Possible moves:", possibleMoves);
 
       let prompt = `You are a chess AI assistant. The current game state in FEN notation is: ${game.fen()}. 
 The available legal moves in this position are: ${possibleMoves.join(", ")}. `;
@@ -522,14 +521,12 @@ Return ONLY the move in standard algebraic notation, without any additional text
       const aiMove = data.response.trim();
 
       if (possibleMoves.includes(aiMove)) {
-        console.log("Selected AI move:", aiMove);
         makeAMove(aiMove);
         playMoveSound();
       } else {
         console.error("Invalid AI move received:", aiMove);
         const fallbackMove =
           possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-        console.log("Falling back to:", fallbackMove);
         makeAMove(fallbackMove);
         playMoveSound();
       }
@@ -538,13 +535,12 @@ Return ONLY the move in standard algebraic notation, without any additional text
       const possibleMoves = game.moves();
       const fallbackMove =
         possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-      console.log("Error fallback move:", fallbackMove);
       makeAMove(fallbackMove);
     }
   }, [game, makeAMove, mode, userColor, opponent]);
 
+  //  Handle AI move
   const handleAIMove = useCallback(() => {
-    console.log("Handle AI move called");
     if (game.isGameOver()) {
       if (game.isCheckmate()) {
         setShowCheckmateDialog(true);
@@ -560,6 +556,7 @@ Return ONLY the move in standard algebraic notation, without any additional text
     getAIMove();
   }, [game, getAIMove]);
 
+  //  Start game
   useEffect(() => {
     if (gameStarted && game.turn() !== userColor[0]) {
       handleAIMove();
@@ -569,7 +566,6 @@ Return ONLY the move in standard algebraic notation, without any additional text
   if (!mounted || isLoadingGame) {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-black flex flex-col">
-        {/* Navigation Bar Skeleton */}
         <nav className="py-4 px-6 flex justify-between items-center">
           <div className="text-2xl font-bold">
             <Skeleton className="h-8 w-24" />
@@ -584,17 +580,13 @@ Return ONLY the move in standard algebraic notation, without any additional text
           </div>
         </nav>
 
-        {/* Main Content Skeleton */}
         <div className="flex-grow flex flex-col items-center justify-center p-6">
           <div className="flex space-x-6">
-            {/* Chess Board Skeleton */}
             <div className="w-[800px]">
               <Skeleton className="h-[700px] w-[700px]" />
             </div>
 
-            {/* Controls Panel Skeleton */}
             <div className="w-120 space-y-5">
-              {/* Game Controls Section */}
               <Skeleton className="h-6 w-32 mb-4" />
               <div className="mb-4 flex space-x-4">
                 <Skeleton className="h-10 w-32" />
@@ -602,7 +594,6 @@ Return ONLY the move in standard algebraic notation, without any additional text
                 <Skeleton className="h-10 w-24" />
               </div>
 
-              {/* Difficulty Section */}
               <Skeleton className="h-6 w-36 mb-2" />
               <div className="flex space-x-4">
                 <Skeleton className="h-8 w-20" />
@@ -610,7 +601,6 @@ Return ONLY the move in standard algebraic notation, without any additional text
                 <Skeleton className="h-8 w-20" />
               </div>
 
-              {/* Match Controls Section */}
               <Skeleton className="h-6 w-32 mb-2" />
               <div className="flex space-x-2">
                 <Skeleton className="h-10 w-24" />
@@ -619,7 +609,6 @@ Return ONLY the move in standard algebraic notation, without any additional text
                 <Skeleton className="h-10 w-24" />
               </div>
 
-              {/* Moves Section */}
               <Skeleton className="h-6 w-24 mb-2" />
               <Skeleton className="h-96 w-full rounded-md" />
             </div>

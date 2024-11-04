@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
-import { Moon, Sun, RotateCcw, Home } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,7 +27,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Toaster } from "sonner";
 
 export default function PuzzleSolver() {
   const router = useRouter();
@@ -51,6 +50,7 @@ export default function PuzzleSolver() {
   const encodedData = searchParams.get("data");
   const data = encodedData ? JSON.parse(decodeURIComponent(encodedData)) : null;
 
+  //   Initialize audio
   const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector(
@@ -62,17 +62,11 @@ export default function PuzzleSolver() {
     }
   }, []);
 
+  //   Initialize audio
   useEffect(() => {
     try {
       const audio = new Audio("/move-self.wav");
-      console.log("Audioooo : ", audio);
-
-      // Add loading event listener
-      audio.addEventListener("canplaythrough", () => {
-        console.log("Audio loaded successfully");
-      });
-
-      // Add error event listener
+      audio.addEventListener("canplaythrough", () => {});
       audio.addEventListener("error", (e) => {
         console.error("Audio loading error:", {
           error: e.target.error,
@@ -80,13 +74,8 @@ export default function PuzzleSolver() {
           readyState: audio.readyState,
         });
       });
-
       moveAudioRef.current = audio;
-
-      // Optional: Preload the audio
       audio.load();
-
-      // Cleanup listeners on unmount
       return () => {
         audio.removeEventListener("canplaythrough", () => {});
         audio.removeEventListener("error", () => {});
@@ -96,19 +85,16 @@ export default function PuzzleSolver() {
     }
   }, []);
 
+  //   Play move sound
   const playMoveSound = () => {
     try {
       if (moveAudioRef.current) {
-        console.log("Attempting to play sound from:", moveAudioRef.current.src);
         moveAudioRef.current.currentTime = 0;
         const playPromise = moveAudioRef.current.play();
-        console.log(playPromise);
 
         if (playPromise !== undefined) {
           playPromise
-            .then(() => {
-              console.log("Audio played successfully");
-            })
+            .then(() => {})
             .catch((err) => {
               console.error("Playback error:", {
                 error: err,
@@ -129,6 +115,7 @@ export default function PuzzleSolver() {
     }
   };
 
+  //   Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
@@ -149,24 +136,20 @@ export default function PuzzleSolver() {
     }
   }, []);
 
+  //   Fetch user data
   useEffect(() => {
     if (data && mounted && !game) {
-      // Add !game check
       const newGame = new Chess(data.fen);
-      console.log(data.fen);
-
       const isWhiteToMove = data.fen.split(" ")[1] === "w";
-
       setPuzzleData(data);
       setUserColor(isWhiteToMove ? "white" : "black");
       updateGame(newGame);
     }
   }, [data, mounted, updateGame, game]);
 
-  // Separate effect for messages
+  //   Set initial messages
   useEffect(() => {
     if (username && userColor && game && !messages.length) {
-      // Add !messages.length check
       setMessages([
         {
           role: "assistant",
@@ -177,6 +160,7 @@ export default function PuzzleSolver() {
     }
   }, [username, userColor, game, messages.length]);
 
+  //   Clean up
   useEffect(() => {
     return () => {
       setGame(null);
@@ -187,6 +171,7 @@ export default function PuzzleSolver() {
     };
   }, []);
 
+  // Add message to chat
   const addMessage = useCallback(
     (content, role = "assistant", isThinking = false) => {
       setMessages((prev) => [...prev, { role, content, isThinking }]);
@@ -194,10 +179,12 @@ export default function PuzzleSolver() {
     []
   );
 
+  // Remove thinking messages
   const removeThinkingMessages = () => {
     setMessages((prev) => prev.filter((msg) => !msg.isThinking));
   };
 
+  // Get move response
   const getMoveResponse = async (move) => {
     try {
       const prompt = `You are a chess coach. The player just made the move ${move}. 
@@ -223,6 +210,7 @@ export default function PuzzleSolver() {
     }
   };
 
+  //   Get hint response
   const getHint = useCallback(async () => {
     if (!gameRef.current) return;
 
@@ -265,6 +253,7 @@ export default function PuzzleSolver() {
     }
   }, [gameRef]);
 
+  //   Make a move for user and AI
   const makeAMove = useCallback(
     async (move) => {
       if (!gameRef.current) return null;
@@ -320,6 +309,7 @@ export default function PuzzleSolver() {
     [updateGame]
   );
 
+  //   Get AI move
   const getAIMove = useCallback(async () => {
     if (!gameRef.current) return;
 
@@ -372,6 +362,7 @@ export default function PuzzleSolver() {
     }
   }, [gameRef, userColor, makeAMove]);
 
+  //   Handle drop event on user dropping piece on board
   const onDrop = useCallback(
     async (sourceSquare, targetSquare) => {
       if (!gameRef.current || isAIThinking) return false;
@@ -408,6 +399,7 @@ export default function PuzzleSolver() {
     [gameRef, userColor, isAIThinking, makeAMove, getAIMove]
   );
 
+  //   Reset puzzle
   const resetPuzzle = useCallback(() => {
     if (puzzleData) {
       const newGame = new Chess(puzzleData.fen);
@@ -424,6 +416,7 @@ export default function PuzzleSolver() {
     }
   }, [puzzleData, updateGame, username, userColor]);
 
+  //   Fetch user data
   const fetchUserData = async (id) => {
     try {
       const response = await fetch(`/api/user?id=${id}`, {
@@ -442,49 +435,42 @@ export default function PuzzleSolver() {
     }
   };
 
+  //   Handle sign out
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
     router.push("/");
   };
 
+  //   Loading skeleton
   const LoadingSkeleton = () => (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
-      {/* Navigation Bar Skeleton */}
       <nav className="h-16 px-6 flex justify-between items-center border-b">
-        <Skeleton className="h-8 w-24" /> {/* Logo */}
+        <Skeleton className="h-8 w-24" />
         <div className="flex items-center gap-4">
-          <Skeleton className="h-9 w-9 rounded-full" /> {/* Theme toggle */}
-          <Skeleton className="h-9 w-24" /> {/* Username */}
+          <Skeleton className="h-9 w-9 rounded-full" />
+          <Skeleton className="h-9 w-24" />
         </div>
       </nav>
 
-      {/* Main Content Skeleton */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="flex gap-8 items-start max-w-[1200px] w-full">
-          {/* Left Column - Chessboard Skeleton */}
           <div className="flex-1 flex flex-col items-center">
-            {/* Puzzle Title */}
             <Skeleton className="h-8 w-48 mb-6" />
 
-            {/* Turn Indicators */}
             <div className="flex space-x-2 mb-4">
               <Skeleton className="h-8 w-32" />
               <Skeleton className="h-8 w-32" />
             </div>
 
-            {/* Chessboard */}
             <Skeleton className="w-[600px] h-[600px] mb-6" />
 
-            {/* Control Buttons */}
             <div className="flex gap-4">
               <Skeleton className="h-10 w-32" />
               <Skeleton className="h-10 w-32" />
             </div>
           </div>
 
-          {/* Right Column - Chat Panel Skeleton */}
           <div className="w-[400px] h-[700px] flex flex-col bg-background rounded-lg border shadow-sm">
-            {/* Header */}
             <div className="px-4 py-3 border-b">
               <div className="flex items-center justify-between">
                 <Skeleton className="h-6 w-32" />
@@ -492,7 +478,6 @@ export default function PuzzleSolver() {
               </div>
             </div>
 
-            {/* Messages Area */}
             <div className="flex-1 p-4">
               <div className="flex flex-col space-y-4">
                 {[...Array(4)].map((_, index) => (
@@ -512,7 +497,6 @@ export default function PuzzleSolver() {
               </div>
             </div>
 
-            {/* Hint Badge */}
             <div className="p-4 border-t flex justify-center">
               <Skeleton className="h-8 w-24" />
             </div>
@@ -534,8 +518,6 @@ export default function PuzzleSolver() {
       transition={{ duration: 0.5 }}
       className="h-screen  bg-white dark:bg-black flex flex-col overflow-hidden"
     >
-      {/* Navigation */}
-
       <nav className="h-16 px-6 flex justify-between items-center w-full fixed ">
         <div
           className="text-2xl font-bold  text-black dark:text-white cursor-pointer"
@@ -577,10 +559,9 @@ export default function PuzzleSolver() {
           </DropdownMenu>
         </div>
       </nav>
-      {/* Main Content */}
+
       <div className="flex-1 flex items-center justify-center p-6 pt-20">
         <div className="flex gap-8 items-start max-w-[1200px] w-full">
-          {/* Left Column - Chessboard */}
           <div className="flex-1 flex flex-col items-center">
             <h1 className="text-2xl font-bold mb-6  text-black dark:text-white">
               Puzzle #{puzzleData?.gameId}
@@ -627,7 +608,6 @@ export default function PuzzleSolver() {
             </div>
           </div>
 
-          {/* Right Column - Chat & Hint */}
           <div className="w-[400px] h-[700px] flex flex-col  bg-white dark:bg-black rounded-lg border shadow-sm">
             <div className="px-4 py-3 border-b">
               <div className="flex items-center justify-between">
@@ -668,7 +648,6 @@ export default function PuzzleSolver() {
               </div>
             </ScrollArea>
 
-            {/* Hint Badge */}
             <div className="p-4 border-t flex justify-center">
               <Badge
                 variant="secondary"
@@ -681,7 +660,7 @@ export default function PuzzleSolver() {
           </div>
         </div>
       </div>
-      {/* Success Dialog */}
+
       <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -701,7 +680,6 @@ export default function PuzzleSolver() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* <Toaster /> */}
     </motion.div>
   );
 }

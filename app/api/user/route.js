@@ -2,16 +2,12 @@ import { ObjectId } from "mongodb";
 import clientPromise from "../../../lib/mongodb";
 import { authenticateToken } from "../../../lib/auth";
 import { NextResponse } from "next/server";
-
+// GET /api/user
 async function handler(req) {
-  console.log("User API route called");
   const { searchParams } = new URL(req.url);
   const _id = searchParams.get("id");
-
-  console.log("Received ID:", _id);
-
+  // Check if user id is provided
   if (!_id) {
-    console.log("Missing ID parameter");
     return NextResponse.json(
       { message: "Missing id parameter" },
       { status: 400 }
@@ -21,18 +17,15 @@ async function handler(req) {
   try {
     const client = await clientPromise;
     const db = client.db(process.env.MONGO_DB);
-
-    console.log("Attempting to find user with ID:", _id);
+    // Check if user exists
     const user = await db
       .collection("users")
       .findOne({ _id: new ObjectId(_id) });
-
+    // Return saved game state or null if not found
     if (!user) {
-      console.log("User not found");
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-
-    console.log("User found:", user.email);
+    // Return saved game state or null if not found
     return NextResponse.json({ username: user.email, _id: user._id });
   } catch (error) {
     console.error("Error in API route:", error);

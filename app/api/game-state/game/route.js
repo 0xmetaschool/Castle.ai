@@ -3,10 +3,12 @@ import clientPromise from "../../../../lib/mongodb";
 import { authenticateToken } from "../../../../lib/auth";
 import { NextResponse } from "next/server";
 
+// GET /api/game-state
 async function getHandler(req) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("id");
 
+  // Check if user id is provided
   if (!userId) {
     return NextResponse.json(
       { message: "Missing user id parameter" },
@@ -21,11 +23,11 @@ async function getHandler(req) {
     const user = await db
       .collection("users")
       .findOne({ _id: new ObjectId(userId) });
-
+    // Check if user exists
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-
+    // Return saved game state or null if not found
     return NextResponse.json({
       savedGameState: user.savedGameState || null,
       lastGameTimestamp: user.lastGameTimestamp || null,

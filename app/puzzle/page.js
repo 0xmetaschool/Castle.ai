@@ -36,6 +36,7 @@ export default function PuzzleGallery() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  //   Fetch user data when the component mounts
   useEffect(() => {
     setMounted(true);
     const id = localStorage.getItem("userId");
@@ -45,6 +46,7 @@ export default function PuzzleGallery() {
     }
   }, []);
 
+  //   Function to fetch user data
   const fetchUserData = async (id) => {
     try {
       const response = await fetch(`/api/user?id=${id}`, {
@@ -62,6 +64,7 @@ export default function PuzzleGallery() {
     }
   };
 
+  //   Fetch puzzles on mount
   useEffect(() => {
     setIsLoading(true);
     fetch("/api/puzzles")
@@ -76,19 +79,19 @@ export default function PuzzleGallery() {
       });
   }, []);
 
+  //   Handle puzzle selection on click
   const handlePuzzleSelect = (puzzle) => {
-    console.log("Selected puzzle:", puzzle);
-
     const encodedData = encodeURIComponent(JSON.stringify(puzzle));
-    // router.push(`/puzzle/${puzzleFen}`);
     router.replace(`/puzzle/${puzzle.gameId}?data=${encodedData}`);
   };
 
+  //   Handle sign out
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
     router.push("/");
   };
 
+  //   Loading skeleton
   const LoadingSkeleton = () => (
     <CarouselContent className="h-full">
       {[1, 2, 3].map((index) => (

@@ -1,9 +1,7 @@
 "use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Moon, Sun } from "lucide-react";
 import { motion } from "framer-motion";
@@ -25,17 +23,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 const openingsPerPage = 10;
 
@@ -47,16 +34,13 @@ export default function Learn() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [toast, setToast] = useState(null);
-  const [selection, setSelection] = useState({
-    name: "Select an Opening to learn",
-    fen: "start",
-  });
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState("");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isLoadingOpenings, setIsLoadingOpenings] = useState(true);
 
+  // Function to fetch openings
   const fetchOpenings = useCallback(async (currentPage) => {
     setIsLoadingOpenings(true);
     try {
@@ -74,6 +58,7 @@ export default function Learn() {
     }
   }, []);
 
+  // Fetch user data when the component mounts
   useEffect(() => {
     setMounted(true);
     const id = searchParams.get("id");
@@ -87,6 +72,7 @@ export default function Learn() {
     fetchOpenings(currentPage);
   }, [searchParams, fetchOpenings]);
 
+  // Fetch user data
   const fetchUserData = async (id) => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -105,7 +91,7 @@ export default function Learn() {
       router.push("/");
     }
   };
-
+  // Handle page change when pagination is clicked
   const handlePageChange = useCallback(
     (newPage) => {
       setPage(newPage);
@@ -115,10 +101,12 @@ export default function Learn() {
     [userId, router, fetchOpenings]
   );
 
+  // Handle game change when opening is hovered on
   const handleGameChange = (newGame) => {
     setGame(new Chess(newGame.fen()));
   };
 
+  // Handle opening click for an individual opening
   const handleOpeningClick = (opening) => {
     const encodedName = encodeURIComponent(opening.name);
     const encodedFen = encodeURIComponent(opening.fen);
@@ -128,16 +116,19 @@ export default function Learn() {
     );
   };
 
+  //  Handle sign out
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
     router.push("/");
   };
 
+  // Show toast
   const showToast = (title, description, variant = "default") => {
     setToast({ title, description, variant });
     setTimeout(() => setToast(null), 3000);
   };
 
+  // Skeleton UI
   const OpeningsGridSkeleton = () => (
     <div className="p-10 grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 overflow-y-auto max-h-[calc(100vh-350px)]">
       {[...Array(10)].map((_, index) => (
@@ -151,10 +142,10 @@ export default function Learn() {
     </div>
   );
 
+  // Mount Skeleton UI for the entire page when the component mounts
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-black flex flex-col">
-        {/* Navigation Bar Skeleton */}
         <nav className="py-4 px-6 flex justify-between items-center bg-white dark:bg-black shadow-md fixed">
           <Skeleton className="h-8 w-24" />
           <div className="flex items-center space-x-4">
@@ -165,12 +156,10 @@ export default function Learn() {
 
         <div className="flex-grow flex items-center justify-center p-6">
           <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto gap-8">
-            {/* Chess Board Skeleton */}
             <div className="w-full md:w-1/2 flex items-center justify-center">
               <Skeleton className="h-[550px] w-[550px]" />
             </div>
 
-            {/* Openings Grid Skeleton */}
             <div className="w-full md:w-1/2 flex flex-col">
               <div className="p-10 grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 overflow-y-auto max-h-[calc(100vh-350px)]">
                 {[...Array(10)].map((_, index) => (
@@ -183,7 +172,6 @@ export default function Learn() {
                 ))}
               </div>
 
-              {/* Pagination Skeleton */}
               <div className="mt-auto flex justify-center">
                 <div className="flex items-center space-x-2">
                   <Skeleton className="h-10 w-10 rounded-lg" />
@@ -273,9 +261,6 @@ export default function Learn() {
                       try {
                         const newGame = new Chess(opening.fen);
                         handleGameChange(newGame);
-                        console.log(
-                          "!!!!!!!!!!!!!!!!! OPening content : " + opening._id
-                        );
                       } catch (error) {
                         console.error(error);
                       }

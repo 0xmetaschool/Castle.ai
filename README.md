@@ -17,7 +17,7 @@ Ready to revolutionize your chess game? Castle.ai brings the power of artificial
 
 ## Demo
 
-🚀 [Live Demo](https://castle-ai.vercel.app/)
+🚀 [Live Demo](https://castle-ai-metaschool.vercel.app/)
 
 ## Features
 
@@ -112,8 +112,13 @@ MONGO_URI=
 MONGO_DB=castleAI
 OPENAI_API_KEY=
 JWT_SECRET=
-
 ```
+
+To obtain the required credentials:
+
+- `MONGO_URI`: Create a free MongoDB Atlas cluster and obtain your connection string from [MongoDB Atlas](https://www.mongodb.com/docs/atlas/tutorial/connect-to-your-cluster/)
+- `OPENAI_API_KEY`: Generate an API key from your [OpenAI dashboard](https://platform.openai.com/api-keys)
+- `JWT_SECRET`: This can be any long, random string. For production, you can generate a secure random string using a tool like [generate-secret](https://generate-secret.vercel.app/32)
 
 4. **Start the development server**
 
@@ -192,7 +197,6 @@ Visit `http://localhost:3000` to see the application running.
 - Opening repertoire builder
 - Personal progress analytics
 - Advanced game analysis tools
-- Video lessons integration
 - Community forums and discussions
 
 #### AI Enhancements

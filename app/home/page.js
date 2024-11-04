@@ -29,24 +29,25 @@ function Dashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch user data when the component mounts
   useEffect(() => {
     setMounted(true);
     const id = searchParams.get("id");
     if (id) {
-      console.log("Token present");
       fetchUserData(id);
     } else {
       const token = localStorage.getItem("jwtToken");
       if (!token) {
-        console.log("Should push to root");
+        // No token found, redirect to login page
         router.push("/");
       } else {
-        console.log("Token present");
+        // Token found, fetch user data
         fetchUserData(id);
       }
     }
   }, [searchParams, router]);
 
+  // Fetch user data
   const fetchUserData = async (id) => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -61,8 +62,6 @@ function Dashboard() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("Home Page Response:", response);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -80,6 +79,7 @@ function Dashboard() {
     }
   };
 
+  // Handle image loading
   const handleImageLoad = (section) => {
     setImagesLoaded((prev) => ({
       ...prev,
@@ -87,13 +87,16 @@ function Dashboard() {
     }));
   };
 
+  // Handle sign out
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
     router.push("/");
   };
 
+  // Handle theme toggle
   if (!mounted) return null;
 
+  // Card data for the dashboard
   const cards = [
     {
       href: `/play?id=${userId}`,
@@ -178,6 +181,7 @@ function Dashboard() {
                         theme === "dark" ? "" : "invert"
                       } ${!imagesLoaded[item.key] ? "invisible" : ""}`}
                       onLoad={() => handleImageLoad(item.key)}
+                      unoptimized
                     />
                   </div>
                   {isLoading ? (

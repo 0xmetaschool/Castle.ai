@@ -1,12 +1,12 @@
 import clientPromise from "../../../lib/mongodb";
-
+// GET /api/puzzles
 export async function GET(request) {
   try {
     const client = await clientPromise;
     const db = client.db(process.env.MONGO_DB);
-
+    // Check if puzzle exists
     const puzzle = await db.collection("puzzle").findOne({});
-
+    //  Return error if puzzle doesn't exist
     if (!puzzle) {
       return new Response(
         JSON.stringify({ message: "No puzzle found in the collection" }),
@@ -16,7 +16,7 @@ export async function GET(request) {
         }
       );
     }
-
+    // Return puzzle
     return new Response(JSON.stringify(puzzle), {
       status: 200,
       headers: { "Content-Type": "application/json" },
