@@ -12,7 +12,7 @@ A Chess game where you can learn and play with AI.
 - [Contributions](#contributing)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
-- [Contact](#contact)
+- [FAQs](#faqs)
 
 ## Demo
 
@@ -234,7 +234,12 @@ We love contributions! Here's how you can help make the project even better:
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/0xmetaschool/Castle.ai/blob/main/LICENSE) file for details.
 
-## Frequently Asked Questions (FAQs)
+## Acknowledgments
+
+- OpenAI for GPT-4 API access
+- shadcn team for the component library
+
+## FAQs
 
 ### Q1: Do I need to create an account to use Castle.ai?
 To access the full features of Castle.ai including game saves, opening progress tracking, and personalized statistics, you'll need to create an account. Creating an account is free and allows you to:
