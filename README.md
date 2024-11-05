@@ -242,59 +242,11 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 ## FAQs
 
 ### Q1: Do I need to create an account to use Castle.ai?
-To access the full features of Castle.ai including game saves, opening progress tracking, and personalized statistics, you'll need to create an account. Creating an account is free and allows you to:
-- Save and resume your games
-- Track your progress in opening studies
-- Save your puzzle-solving statistics
-- Access personalized learning paths
-- Sync your preferences across devices
+Yes, a free account is required to access game saves, track progress, and use personalized features.
 
 ### Q2: What makes Castle.ai different from other chess learning platforms?
-Castle.ai offers several unique features:
-- AI personalities that authentically mimic famous players' styles:
-  - Magnus Carlsen's positional play
-  - Garry Kasparov's aggressive tactics
-  - Bobby Fischer's precise technique
-  - Samay Raina's entertaining approach
-- Access to 11,493 chess openings with interactive tutorials
-- AI-powered move explanations and analysis
-- Progressive learning system that adapts to your skill level
-- Seamless integration of learning, practice, and entertainment features
+Castle.ai uniquely combines AI personalities mimicking famous players like Magnus Carlsen and Garry Kasparov, along with access to 11,493 chess openings and AI-powered analysis.
 
-### Q3: What skill level is Castle.ai designed for?
-Castle.ai is designed for chess players at every level:
-
-Beginners:
-- Easy-mode AI opponents
-- Basic opening fundamentals
-- Guided puzzle solving
-- Interactive tutorials
-- Step-by-step learning paths
-
-Intermediate Players:
-- Medium difficulty AI games
-- Tactical pattern recognition
-- Comprehensive opening studies
-- Position analysis tools
-
-Advanced Players:
-- Hard-mode AI challenges
-- Complex tactical puzzles
-- Deep opening preparation
-- Advanced position evaluation
-- Custom training scenarios
-
-### Q4: What technical requirements do I need to run Castle.ai?
-Minimum Requirements:
-- Modern web browser (Chrome, Firefox, Safari, or Edge)
-- Internet connection for full features
-- Device with at least 4GB RAM
-- Screen resolution of 1024x768 or higher
-
-Recommended Setup:
-- High-speed internet connection
-- 8GB+ RAM
-- 1920x1080 or higher resolution
-- Updated browser version
-- Desktop or laptop computer for optimal experience
+### Q3: What technical requirements do I need to run Castle.ai?
+You'll need a modern web browser, stable internet connection, and a device with at least 4GB RAM to run Castle.ai smoothly.
 
