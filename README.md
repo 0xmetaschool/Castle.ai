@@ -238,7 +238,3 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 - OpenAI for GPT-4 API access
 - shadcn team for the component library
-
-## Contact
-
-Please open an issue in the GitHub repository for any queries or support.
