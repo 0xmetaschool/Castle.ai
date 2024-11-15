@@ -66,8 +66,13 @@ npm run dev
 
 ## Screenshots
 
-<div align="center">
-  <img src="public/App.gif" alt="Application Demo" width="800px" />
+<div style="display: flex; justify-content: space-between;">
+  <img src="https://github.com/0xmetaschool/Castle.ai/blob/main/public/castle-ai-template-landing-page.png?raw=true" alt="Castle.ai Template Landing Page screenshot" style="width: 49%; border: 2px solid black;" />
+  <img src="https://github.com/0xmetaschool/Castle.ai/blob/main/public/castle-ai-template-home-page.png?raw=true" alt="Castle.ai Template Home Page screenshot" style="width: 49%; border: 2px solid black;" />
+</div>
+<div style="display: flex; justify-content: space-between;">
+  <img src="https://github.com/0xmetaschool/Castle.ai/blob/main/public/castle-ai-template-game-page.png?raw=true" alt="Castle.ai Template Game Page screenshot" style="width: 49%; border: 2px solid black;" />
+  <img src="https://github.com/0xmetaschool/Castle.ai/blob/main/public/castle-ai-template-puzzle-page.png?raw=true" alt="Castle.ai Template Puzzle Page screenshot" style="width: 49%; border: 2px solid black;" />
 </div>
 
 ## How to use the application
