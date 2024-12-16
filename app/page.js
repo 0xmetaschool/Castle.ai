@@ -50,6 +50,46 @@ export default function Home() {
     setView(newView);
   };
 
+  const handleDemo = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: "test@metaschool.so",
+          password: "test",
+        }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("jwtToken", data.token);
+        localStorage.setItem("userId", data.userId);
+        setAlertInfo({
+          show: true,
+          title: "Success",
+          message: "Demo login successful. Setting up your board..",
+          variant: "default",
+        });
+        setTimeout(() => {
+          router.push(`/home?id=${data.userId}`);
+        }, 2000);
+      } else {
+        throw new Error(data.message || "Demo login failed");
+      }
+    } catch (error) {
+      setAlertInfo({
+        show: true,
+        title: "Error",
+        message: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (e, type) => {
     e.preventDefault();
     setIsLoading(true);
@@ -125,6 +165,13 @@ export default function Home() {
                 className="text-2xl py-6 px-9"
               >
                 Register
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleDemo()}
+                className="text-2xl py-6 px-9"
+              >
+                Try the Demo
               </Button>
             </div>
           </motion.div>
